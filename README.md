@@ -6,7 +6,7 @@ tas_car
 This programm will make the car follow a monochrome ball.
 
 ### Demonstration video
-[![demo video](https://img.youtube.com/vi/x-ZtEVpXXc/0.jpg)](http://www.youtube.com/watch?v=x-ZtEVpXXc)
+[![demo video](https://img.youtube.com/vi/x--ZtEVpXXc/0.jpg)](http://www.youtube.com/watch?v=x--ZtEVpXXc)
 
 ### How it works
 It is splitted in three parts:
