@@ -19,7 +19,7 @@ It is splitted in three parts:
 
 Try to put the camera below the bumper for best result:
 
-![picture tas-car with camera](./follow_ball_doxygen/html/20170126_164502.png)
+![picture tas-car with camera](pictures/20170126_164502.png)
 #### Requirements:
 * camera
 * monochrome ball
@@ -63,7 +63,6 @@ important params:
 * **DESIRED_R** set it to the value depending on the size of the ball and the image (demo was 55 with a 640pixel width image, the ball had r ca. 1.5cm
 * **ANGLE_MAX** depends on the viewing angle of the camera (set it a bit higher to be sure)
 * **MAX_SEC_TRY_TO_FOLLOW** how long shall the car try to find the ball if it sees none (only important if autonomous is set to false)
-for detailed information check the [documentation](follow_ball_doxygen)
 
 
 #### Using autonomous stack
