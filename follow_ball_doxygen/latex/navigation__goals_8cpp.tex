@@ -1,0 +1,426 @@
+\hypertarget{navigation__goals_8cpp}{}\section{/home/raimund/catkin\+\_\+ws/src/tas\+\_\+group\+\_\+10/follow\+\_\+ball/src/navigation\+\_\+goals.cpp File Reference}
+\label{navigation__goals_8cpp}\index{/home/raimund/catkin\+\_\+ws/src/tas\+\_\+group\+\_\+10/follow\+\_\+ball/src/navigation\+\_\+goals.\+cpp@{/home/raimund/catkin\+\_\+ws/src/tas\+\_\+group\+\_\+10/follow\+\_\+ball/src/navigation\+\_\+goals.\+cpp}}
+{\ttfamily \#include $<$ros/ros.\+h$>$}\\*
+{\ttfamily \#include $<$move\+\_\+base\+\_\+msgs/\+Move\+Base\+Action.\+h$>$}\\*
+{\ttfamily \#include $<$actionlib/client/simple\+\_\+action\+\_\+client.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}../include/follow\+\_\+ball/find\+\_\+ball.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}geometry\+\_\+msgs/\+Vector3.\+h\char`\"{}}\\*
+{\ttfamily \#include \char`\"{}sensor\+\_\+msgs/\+Laser\+Scan.\+h\char`\"{}}\\*
+{\ttfamily \#include $<$tf/tf.\+h$>$}\\*
+{\ttfamily \#include $<$wiimote/\+State.\+h$>$}\\*
+{\ttfamily \#include \char`\"{}opencv2/opencv.\+hpp\char`\"{}}\\*
+Include dependency graph for navigation\+\_\+goals.\+cpp\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{navigation__goals_8cpp__incl}
+\end{center}
+\end{figure}
+\subsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\#define \hyperlink{navigation__goals_8cpp_a22a4a74921a4675329f8f987f931f153}{D\+E\+S\+I\+R\+E\+D\+\_\+\+R}~55
+\begin{DoxyCompactList}\small\item\em desired radius of the ball in the image \end{DoxyCompactList}\item 
+\#define \hyperlink{navigation__goals_8cpp_afc1e832a8c33311f4ca0feb53dbe3c54}{D\+E\+S\+I\+R\+E\+D\+\_\+\+Y}~3/4
+\begin{DoxyCompactList}\small\item\em desired Y-\/coordinate of the center of the ball, if higher, go backwards (ball at the bottom of the image \end{DoxyCompactList}\item 
+\#define \hyperlink{navigation__goals_8cpp_a4fb9a482de80f37e77695daa1d38e548}{N\+U\+M\+B\+E\+R\+\_\+\+I\+N\+T}~10
+\begin{DoxyCompactList}\small\item\em how many steps should be saved for the integral part of the pid controller \end{DoxyCompactList}\item 
+\#define \hyperlink{navigation__goals_8cpp_aa4729260b732666338dee7d841aa12f3}{K\+P}~1.\+0
+\begin{DoxyCompactList}\small\item\em value for P\+I\+D controller (using r value of circle to track distance) \end{DoxyCompactList}\item 
+\#define \hyperlink{navigation__goals_8cpp_ade82752ae1652fdf0df9df7a16ffda29}{K\+I}~2/\hyperlink{navigation__goals_8cpp_a4fb9a482de80f37e77695daa1d38e548}{N\+U\+M\+B\+E\+R\+\_\+\+I\+N\+T}
+\begin{DoxyCompactList}\small\item\em values for P\+I\+D controller (using r value of circle to track distance) \end{DoxyCompactList}\item 
+\#define \hyperlink{navigation__goals_8cpp_ad4f9673d16d231643789f081068d2372}{K\+D}~0.\+5
+\begin{DoxyCompactList}\small\item\em values for P\+I\+D controller (using r value of circle to track distance) \end{DoxyCompactList}\item 
+\#define \hyperlink{navigation__goals_8cpp_a83f074e666632431ae6d34eed35d5fe9}{K\+P\+Y}~-\/1/4
+\begin{DoxyCompactList}\small\item\em value for P controller (using y koordinate to track distance) \end{DoxyCompactList}\item 
+\#define \hyperlink{navigation__goals_8cpp_a9f6b452e529861368b0acfd411437c71}{A\+N\+G\+L\+E\+\_\+\+M\+A\+X}~M\+\_\+\+P\+I\+\_\+4
+\begin{DoxyCompactList}\small\item\em max angle of camera (add a bit so it follows more than it should) \end{DoxyCompactList}\item 
+\#define \hyperlink{navigation__goals_8cpp_af0f97ec9692f26180727c94af51cfedc}{O\+A}~0.\+5
+\begin{DoxyCompactList}\small\item\em orientation controller is quadratic, it trys way harder if the ball is at the edge of the image (O\+A$\ast$xdiff² + O\+B$\ast$xdiff) \end{DoxyCompactList}\item 
+\#define \hyperlink{navigation__goals_8cpp_ad2d5f875cdc6d696735f20fa23a895c3}{O\+B}~1
+\begin{DoxyCompactList}\small\item\em orientation controller is quadratic, it trys way harder if the ball is at the edge of the image (O\+A$\ast$xdiff² + O\+B$\ast$xdiff) \end{DoxyCompactList}\item 
+\#define \hyperlink{navigation__goals_8cpp_a3c983eeadd733105fb0fea8729a9f2db}{R\+A\+N\+G\+E\+\_\+\+M\+I\+N}~0.\+12
+\begin{DoxyCompactList}\small\item\em range which should stop movement \end{DoxyCompactList}\item 
+\#define \hyperlink{navigation__goals_8cpp_adf268402c73f6701eef6c494ecfacb30}{M\+A\+X\+\_\+\+S\+E\+C\+\_\+\+T\+R\+Y\+\_\+\+T\+O\+\_\+\+F\+O\+L\+L\+O\+W}~2
+\begin{DoxyCompactList}\small\item\em time it should try to follow \end{DoxyCompactList}\item 
+\#define \hyperlink{navigation__goals_8cpp_a906a40b0c527739a26ef013ac36157cb}{W\+I\+I\+\_\+\+B\+U\+T\+T\+O\+N\+\_\+\+N\+U\+N\+C\+H\+U\+K\+\_\+\+C}~1
+\end{DoxyCompactItemize}
+\subsection*{Typedefs}
+\begin{DoxyCompactItemize}
+\item 
+typedef actionlib\+::\+Simple\+Action\+Client$<$ move\+\_\+base\+\_\+msgs\+::\+Move\+Base\+Action $>$ \hyperlink{navigation__goals_8cpp_a21e20cc0b6656ae897b3cbb969b93241}{Move\+Base\+Client}
+\end{DoxyCompactItemize}
+\subsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+geometry\+\_\+msgs\+::\+Vector3 \hyperlink{navigation__goals_8cpp_afc95d0744af55570d5f72e2c007d26b1}{build\+\_\+servo} (double linear, double orientation)
+\begin{DoxyCompactList}\small\item\em build\+\_\+servo builds servo-\/message with respect to linear and orientation \end{DoxyCompactList}\item 
+move\+\_\+base\+\_\+msgs\+::\+Move\+Base\+Goal \hyperlink{navigation__goals_8cpp_a098ab7cdd714d111e73008cf0697451e}{build\+\_\+goal} (double linear, double orientation)
+\begin{DoxyCompactList}\small\item\em build\+\_\+goal builds move\+\_\+baseage with respect to linear and orientation \end{DoxyCompactList}\item 
+double \hyperlink{navigation__goals_8cpp_ad5f77055f741363f57129694d8359928}{get\+\_\+linear\+\_\+goal\+\_\+y} (\hyperlink{struct_circle}{Circle} circle)
+\begin{DoxyCompactList}\small\item\em get\+\_\+linear\+\_\+goal\+\_\+y builds linear speed with respect to the y-\/coordinate of the center of the circle \end{DoxyCompactList}\item 
+double \hyperlink{navigation__goals_8cpp_aee50875eee1021ae02124e589a3d2ca0}{get\+\_\+linear\+\_\+goal} (\hyperlink{struct_circle}{Circle} circle)
+\begin{DoxyCompactList}\small\item\em get\+\_\+linear\+\_\+goal builds linear speed with respect to the radius of the circle \end{DoxyCompactList}\item 
+double \hyperlink{navigation__goals_8cpp_ad77bcfe20d953822874ffb11f2b4c2ed}{get\+\_\+orientation} (\hyperlink{struct_circle}{Circle} circle)
+\begin{DoxyCompactList}\small\item\em get\+\_\+orientation builds orientation with respect to the x-\/coordinate of the center of the circle \end{DoxyCompactList}\item 
+void \hyperlink{navigation__goals_8cpp_a401b97abbf3e813f2981b210379b4908}{wii\+Callback} (const wiimote\+::\+State\+::\+Const\+Ptr \&wii\+State)
+\begin{DoxyCompactList}\small\item\em wii\+Callback callback for wii-\/controller, sets nunchuk\+\_\+c\+\_\+pressed \end{DoxyCompactList}\item 
+void \hyperlink{navigation__goals_8cpp_adc74481f7eae4505d3200f9f128c4744}{scan\+Callback} (const sensor\+\_\+msgs\+::\+Laser\+Scan\+Const\+Ptr \&scan)
+\item 
+int \hyperlink{navigation__goals_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{main} (int argc, char $\ast$$\ast$argv)
+\end{DoxyCompactItemize}
+\subsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+bool \hyperlink{navigation__goals_8cpp_a53a2d16dac430353052f49aaa0cce34a}{stop} = false
+\begin{DoxyCompactList}\small\item\em stop if near a wall \end{DoxyCompactList}\item 
+int \hyperlink{navigation__goals_8cpp_a86cf672daa4e0ad11ad10efc894d19c8}{num} = 0
+\begin{DoxyCompactList}\small\item\em seq number of goal for autonomous driving \end{DoxyCompactList}\item 
+double \hyperlink{navigation__goals_8cpp_a6943d822a23db3c821ac66e3482e09f5}{desired\+\_\+x} = 0
+\begin{DoxyCompactList}\small\item\em corresponce to the middlepoint of the image \end{DoxyCompactList}\item 
+double \hyperlink{navigation__goals_8cpp_aa094a11625b9bf726abdb71caed8c9f1}{desired\+\_\+y} = 0
+\begin{DoxyCompactList}\small\item\em corresponce to D\+E\+S\+I\+R\+E\+D\+\_\+\+Y \end{DoxyCompactList}\item 
+std\+::vector$<$ double $>$ \hyperlink{navigation__goals_8cpp_a88864b29831db214ef58148acf0b8db4}{linear\+\_\+int}
+\begin{DoxyCompactList}\small\item\em Array for the Integral-\/\+Part of the P\+I\+D Controller. \end{DoxyCompactList}\item 
+int \hyperlink{navigation__goals_8cpp_a084d89d497823f129f42ae61662efee4}{linear\+\_\+int\+\_\+idx} = 0
+\begin{DoxyCompactList}\small\item\em current index of lienar\+\_\+int \end{DoxyCompactList}\item 
+bool \hyperlink{navigation__goals_8cpp_a5bafc98f16f9fd53e0f929fe20b17e1c}{show} = false
+\begin{DoxyCompactList}\small\item\em should the images be shown on screen? \end{DoxyCompactList}\item 
+bool \hyperlink{navigation__goals_8cpp_a4a4c92bfaf637dd8d1776e2ed78dded5}{use\+\_\+autonomus} = false
+\begin{DoxyCompactList}\small\item\em should it use autnomous driving (send goals) or try to follow directly (send servo commands) !\+W\+A\+R\+N\+I\+N\+G -\/$>$ no avoiding! Only drives while Nunchuck button C is pressed \end{DoxyCompactList}\item 
+bool \hyperlink{navigation__goals_8cpp_aa8828b6f9054e8ce4fa719f5790f0ad7}{nunchuk\+\_\+c\+\_\+pressed} = false
+\begin{DoxyCompactList}\small\item\em value to tell if nunchuk c is pressed \end{DoxyCompactList}\item 
+double \hyperlink{navigation__goals_8cpp_aaed5ad0eb2165b9cd4b804f12f44f624}{last\+\_\+orientation} = 0
+\begin{DoxyCompactList}\small\item\em last orientation value to try to follow if not autonomous driving is used \end{DoxyCompactList}\item 
+double \hyperlink{navigation__goals_8cpp_ae432752a3c95315a00b3e3b42d4ba468}{last\+\_\+linear} = 0
+\begin{DoxyCompactList}\small\item\em last linear value \end{DoxyCompactList}\item 
+int \hyperlink{navigation__goals_8cpp_a41c2f8914d0edbc9bfe8019697280a82}{counter\+\_\+try\+\_\+to\+\_\+follow} = 0
+\begin{DoxyCompactList}\small\item\em counter so it doesnt try to follow forever \end{DoxyCompactList}\item 
+int \hyperlink{navigation__goals_8cpp_aea95c33791f3b1d4c3db490749dcc4c2}{counter\+\_\+back} = 0
+\begin{DoxyCompactList}\small\item\em counter so it actually drives backwards \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Macro Definition Documentation}
+\hypertarget{navigation__goals_8cpp_a9f6b452e529861368b0acfd411437c71}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!A\+N\+G\+L\+E\+\_\+\+M\+A\+X@{A\+N\+G\+L\+E\+\_\+\+M\+A\+X}}
+\index{A\+N\+G\+L\+E\+\_\+\+M\+A\+X@{A\+N\+G\+L\+E\+\_\+\+M\+A\+X}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{A\+N\+G\+L\+E\+\_\+\+M\+A\+X}]{\setlength{\rightskip}{0pt plus 5cm}\#define A\+N\+G\+L\+E\+\_\+\+M\+A\+X~M\+\_\+\+P\+I\+\_\+4}\label{navigation__goals_8cpp_a9f6b452e529861368b0acfd411437c71}
+
+
+max angle of camera (add a bit so it follows more than it should) 
+
+\hypertarget{navigation__goals_8cpp_a22a4a74921a4675329f8f987f931f153}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!D\+E\+S\+I\+R\+E\+D\+\_\+\+R@{D\+E\+S\+I\+R\+E\+D\+\_\+\+R}}
+\index{D\+E\+S\+I\+R\+E\+D\+\_\+\+R@{D\+E\+S\+I\+R\+E\+D\+\_\+\+R}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{D\+E\+S\+I\+R\+E\+D\+\_\+\+R}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\+E\+S\+I\+R\+E\+D\+\_\+\+R~55}\label{navigation__goals_8cpp_a22a4a74921a4675329f8f987f931f153}
+
+
+desired radius of the ball in the image 
+
+\hypertarget{navigation__goals_8cpp_afc1e832a8c33311f4ca0feb53dbe3c54}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!D\+E\+S\+I\+R\+E\+D\+\_\+\+Y@{D\+E\+S\+I\+R\+E\+D\+\_\+\+Y}}
+\index{D\+E\+S\+I\+R\+E\+D\+\_\+\+Y@{D\+E\+S\+I\+R\+E\+D\+\_\+\+Y}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{D\+E\+S\+I\+R\+E\+D\+\_\+\+Y}]{\setlength{\rightskip}{0pt plus 5cm}\#define D\+E\+S\+I\+R\+E\+D\+\_\+\+Y~3/4}\label{navigation__goals_8cpp_afc1e832a8c33311f4ca0feb53dbe3c54}
+
+
+desired Y-\/coordinate of the center of the ball, if higher, go backwards (ball at the bottom of the image 
+
+\hypertarget{navigation__goals_8cpp_ad4f9673d16d231643789f081068d2372}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!K\+D@{K\+D}}
+\index{K\+D@{K\+D}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{K\+D}]{\setlength{\rightskip}{0pt plus 5cm}\#define K\+D~0.\+5}\label{navigation__goals_8cpp_ad4f9673d16d231643789f081068d2372}
+
+
+values for P\+I\+D controller (using r value of circle to track distance) 
+
+\hypertarget{navigation__goals_8cpp_ade82752ae1652fdf0df9df7a16ffda29}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!K\+I@{K\+I}}
+\index{K\+I@{K\+I}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{K\+I}]{\setlength{\rightskip}{0pt plus 5cm}\#define K\+I~2/{\bf N\+U\+M\+B\+E\+R\+\_\+\+I\+N\+T}}\label{navigation__goals_8cpp_ade82752ae1652fdf0df9df7a16ffda29}
+
+
+values for P\+I\+D controller (using r value of circle to track distance) 
+
+\hypertarget{navigation__goals_8cpp_aa4729260b732666338dee7d841aa12f3}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!K\+P@{K\+P}}
+\index{K\+P@{K\+P}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{K\+P}]{\setlength{\rightskip}{0pt plus 5cm}\#define K\+P~1.\+0}\label{navigation__goals_8cpp_aa4729260b732666338dee7d841aa12f3}
+
+
+value for P\+I\+D controller (using r value of circle to track distance) 
+
+\hypertarget{navigation__goals_8cpp_a83f074e666632431ae6d34eed35d5fe9}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!K\+P\+Y@{K\+P\+Y}}
+\index{K\+P\+Y@{K\+P\+Y}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{K\+P\+Y}]{\setlength{\rightskip}{0pt plus 5cm}\#define K\+P\+Y~-\/1/4}\label{navigation__goals_8cpp_a83f074e666632431ae6d34eed35d5fe9}
+
+
+value for P controller (using y koordinate to track distance) 
+
+\hypertarget{navigation__goals_8cpp_adf268402c73f6701eef6c494ecfacb30}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!M\+A\+X\+\_\+\+S\+E\+C\+\_\+\+T\+R\+Y\+\_\+\+T\+O\+\_\+\+F\+O\+L\+L\+O\+W@{M\+A\+X\+\_\+\+S\+E\+C\+\_\+\+T\+R\+Y\+\_\+\+T\+O\+\_\+\+F\+O\+L\+L\+O\+W}}
+\index{M\+A\+X\+\_\+\+S\+E\+C\+\_\+\+T\+R\+Y\+\_\+\+T\+O\+\_\+\+F\+O\+L\+L\+O\+W@{M\+A\+X\+\_\+\+S\+E\+C\+\_\+\+T\+R\+Y\+\_\+\+T\+O\+\_\+\+F\+O\+L\+L\+O\+W}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{M\+A\+X\+\_\+\+S\+E\+C\+\_\+\+T\+R\+Y\+\_\+\+T\+O\+\_\+\+F\+O\+L\+L\+O\+W}]{\setlength{\rightskip}{0pt plus 5cm}\#define M\+A\+X\+\_\+\+S\+E\+C\+\_\+\+T\+R\+Y\+\_\+\+T\+O\+\_\+\+F\+O\+L\+L\+O\+W~2}\label{navigation__goals_8cpp_adf268402c73f6701eef6c494ecfacb30}
+
+
+time it should try to follow 
+
+\hypertarget{navigation__goals_8cpp_a4fb9a482de80f37e77695daa1d38e548}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!N\+U\+M\+B\+E\+R\+\_\+\+I\+N\+T@{N\+U\+M\+B\+E\+R\+\_\+\+I\+N\+T}}
+\index{N\+U\+M\+B\+E\+R\+\_\+\+I\+N\+T@{N\+U\+M\+B\+E\+R\+\_\+\+I\+N\+T}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{N\+U\+M\+B\+E\+R\+\_\+\+I\+N\+T}]{\setlength{\rightskip}{0pt plus 5cm}\#define N\+U\+M\+B\+E\+R\+\_\+\+I\+N\+T~10}\label{navigation__goals_8cpp_a4fb9a482de80f37e77695daa1d38e548}
+
+
+how many steps should be saved for the integral part of the pid controller 
+
+\hypertarget{navigation__goals_8cpp_af0f97ec9692f26180727c94af51cfedc}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!O\+A@{O\+A}}
+\index{O\+A@{O\+A}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{O\+A}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+A~0.\+5}\label{navigation__goals_8cpp_af0f97ec9692f26180727c94af51cfedc}
+
+
+orientation controller is quadratic, it trys way harder if the ball is at the edge of the image (O\+A$\ast$xdiff² + O\+B$\ast$xdiff) 
+
+\hypertarget{navigation__goals_8cpp_ad2d5f875cdc6d696735f20fa23a895c3}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!O\+B@{O\+B}}
+\index{O\+B@{O\+B}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{O\+B}]{\setlength{\rightskip}{0pt plus 5cm}\#define O\+B~1}\label{navigation__goals_8cpp_ad2d5f875cdc6d696735f20fa23a895c3}
+
+
+orientation controller is quadratic, it trys way harder if the ball is at the edge of the image (O\+A$\ast$xdiff² + O\+B$\ast$xdiff) 
+
+\hypertarget{navigation__goals_8cpp_a3c983eeadd733105fb0fea8729a9f2db}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!R\+A\+N\+G\+E\+\_\+\+M\+I\+N@{R\+A\+N\+G\+E\+\_\+\+M\+I\+N}}
+\index{R\+A\+N\+G\+E\+\_\+\+M\+I\+N@{R\+A\+N\+G\+E\+\_\+\+M\+I\+N}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{R\+A\+N\+G\+E\+\_\+\+M\+I\+N}]{\setlength{\rightskip}{0pt plus 5cm}\#define R\+A\+N\+G\+E\+\_\+\+M\+I\+N~0.\+12}\label{navigation__goals_8cpp_a3c983eeadd733105fb0fea8729a9f2db}
+
+
+range which should stop movement 
+
+\hypertarget{navigation__goals_8cpp_a906a40b0c527739a26ef013ac36157cb}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!W\+I\+I\+\_\+\+B\+U\+T\+T\+O\+N\+\_\+\+N\+U\+N\+C\+H\+U\+K\+\_\+\+C@{W\+I\+I\+\_\+\+B\+U\+T\+T\+O\+N\+\_\+\+N\+U\+N\+C\+H\+U\+K\+\_\+\+C}}
+\index{W\+I\+I\+\_\+\+B\+U\+T\+T\+O\+N\+\_\+\+N\+U\+N\+C\+H\+U\+K\+\_\+\+C@{W\+I\+I\+\_\+\+B\+U\+T\+T\+O\+N\+\_\+\+N\+U\+N\+C\+H\+U\+K\+\_\+\+C}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{W\+I\+I\+\_\+\+B\+U\+T\+T\+O\+N\+\_\+\+N\+U\+N\+C\+H\+U\+K\+\_\+\+C}]{\setlength{\rightskip}{0pt plus 5cm}\#define W\+I\+I\+\_\+\+B\+U\+T\+T\+O\+N\+\_\+\+N\+U\+N\+C\+H\+U\+K\+\_\+\+C~1}\label{navigation__goals_8cpp_a906a40b0c527739a26ef013ac36157cb}
+
+
+\subsection{Typedef Documentation}
+\hypertarget{navigation__goals_8cpp_a21e20cc0b6656ae897b3cbb969b93241}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!Move\+Base\+Client@{Move\+Base\+Client}}
+\index{Move\+Base\+Client@{Move\+Base\+Client}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{Move\+Base\+Client}]{\setlength{\rightskip}{0pt plus 5cm}typedef actionlib\+::\+Simple\+Action\+Client$<$move\+\_\+base\+\_\+msgs\+::\+Move\+Base\+Action$>$ {\bf Move\+Base\+Client}}\label{navigation__goals_8cpp_a21e20cc0b6656ae897b3cbb969b93241}
+
+
+\subsection{Function Documentation}
+\hypertarget{navigation__goals_8cpp_a098ab7cdd714d111e73008cf0697451e}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!build\+\_\+goal@{build\+\_\+goal}}
+\index{build\+\_\+goal@{build\+\_\+goal}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{build\+\_\+goal}]{\setlength{\rightskip}{0pt plus 5cm}move\+\_\+base\+\_\+msgs\+::\+Move\+Base\+Goal build\+\_\+goal (
+\begin{DoxyParamCaption}
+\item[{double}]{linear, }
+\item[{double}]{orientation}
+\end{DoxyParamCaption}
+)}\label{navigation__goals_8cpp_a098ab7cdd714d111e73008cf0697451e}
+
+
+build\+\_\+goal builds move\+\_\+baseage with respect to linear and orientation 
+
+
+\begin{DoxyParams}{Parameters}
+{\em linear} & positiv if it should drive forward, near 0 if it should stop, negativ if drive backwards \\
+\hline
+{\em orientation} & orientation if it should drive left or right \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+move\+\_\+base message which should be published to /move\+\_\+base\+\_\+simple/goal 
+\end{DoxyReturn}
+\hypertarget{navigation__goals_8cpp_afc95d0744af55570d5f72e2c007d26b1}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!build\+\_\+servo@{build\+\_\+servo}}
+\index{build\+\_\+servo@{build\+\_\+servo}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{build\+\_\+servo}]{\setlength{\rightskip}{0pt plus 5cm}geometry\+\_\+msgs\+::\+Vector3 build\+\_\+servo (
+\begin{DoxyParamCaption}
+\item[{double}]{linear, }
+\item[{double}]{orientation}
+\end{DoxyParamCaption}
+)}\label{navigation__goals_8cpp_afc95d0744af55570d5f72e2c007d26b1}
+
+
+build\+\_\+servo builds servo-\/message with respect to linear and orientation 
+
+
+\begin{DoxyParams}{Parameters}
+{\em linear} & positiv if it should drive forward, near 0 if it should stop, negativ if drive backwards \\
+\hline
+{\em orientation} & orientation if it should drive left or right \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+servo-\/message which should be published to /servo 
+\end{DoxyReturn}
+\hypertarget{navigation__goals_8cpp_aee50875eee1021ae02124e589a3d2ca0}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!get\+\_\+linear\+\_\+goal@{get\+\_\+linear\+\_\+goal}}
+\index{get\+\_\+linear\+\_\+goal@{get\+\_\+linear\+\_\+goal}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{get\+\_\+linear\+\_\+goal}]{\setlength{\rightskip}{0pt plus 5cm}double get\+\_\+linear\+\_\+goal (
+\begin{DoxyParamCaption}
+\item[{{\bf Circle}}]{circle}
+\end{DoxyParamCaption}
+)}\label{navigation__goals_8cpp_aee50875eee1021ae02124e589a3d2ca0}
+
+
+get\+\_\+linear\+\_\+goal builds linear speed with respect to the radius of the circle 
+
+
+\begin{DoxyParams}{Parameters}
+{\em circle} & circle which shall be followed \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+linear speed 
+\end{DoxyReturn}
+\hypertarget{navigation__goals_8cpp_ad5f77055f741363f57129694d8359928}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!get\+\_\+linear\+\_\+goal\+\_\+y@{get\+\_\+linear\+\_\+goal\+\_\+y}}
+\index{get\+\_\+linear\+\_\+goal\+\_\+y@{get\+\_\+linear\+\_\+goal\+\_\+y}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{get\+\_\+linear\+\_\+goal\+\_\+y}]{\setlength{\rightskip}{0pt plus 5cm}double get\+\_\+linear\+\_\+goal\+\_\+y (
+\begin{DoxyParamCaption}
+\item[{{\bf Circle}}]{circle}
+\end{DoxyParamCaption}
+)}\label{navigation__goals_8cpp_ad5f77055f741363f57129694d8359928}
+
+
+get\+\_\+linear\+\_\+goal\+\_\+y builds linear speed with respect to the y-\/coordinate of the center of the circle 
+
+
+\begin{DoxyParams}{Parameters}
+{\em circle} & circle which shall be followed \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+linear speed 
+\end{DoxyReturn}
+\hypertarget{navigation__goals_8cpp_ad77bcfe20d953822874ffb11f2b4c2ed}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!get\+\_\+orientation@{get\+\_\+orientation}}
+\index{get\+\_\+orientation@{get\+\_\+orientation}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{get\+\_\+orientation}]{\setlength{\rightskip}{0pt plus 5cm}double get\+\_\+orientation (
+\begin{DoxyParamCaption}
+\item[{{\bf Circle}}]{circle}
+\end{DoxyParamCaption}
+)}\label{navigation__goals_8cpp_ad77bcfe20d953822874ffb11f2b4c2ed}
+
+
+get\+\_\+orientation builds orientation with respect to the x-\/coordinate of the center of the circle 
+
+
+\begin{DoxyParams}{Parameters}
+{\em circle} & circle which shall be followed \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+orientation which shall be achieved 
+\end{DoxyReturn}
+\hypertarget{navigation__goals_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!main@{main}}
+\index{main@{main}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{main}]{\setlength{\rightskip}{0pt plus 5cm}int main (
+\begin{DoxyParamCaption}
+\item[{int}]{argc, }
+\item[{char $\ast$$\ast$}]{argv}
+\end{DoxyParamCaption}
+)}\label{navigation__goals_8cpp_a3c04138a5bfe5d72780bb7e82a18e627}
+\hypertarget{navigation__goals_8cpp_adc74481f7eae4505d3200f9f128c4744}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!scan\+Callback@{scan\+Callback}}
+\index{scan\+Callback@{scan\+Callback}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{scan\+Callback}]{\setlength{\rightskip}{0pt plus 5cm}void scan\+Callback (
+\begin{DoxyParamCaption}
+\item[{const sensor\+\_\+msgs\+::\+Laser\+Scan\+Const\+Ptr \&}]{scan}
+\end{DoxyParamCaption}
+)}\label{navigation__goals_8cpp_adc74481f7eae4505d3200f9f128c4744}
+\hypertarget{navigation__goals_8cpp_a401b97abbf3e813f2981b210379b4908}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!wii\+Callback@{wii\+Callback}}
+\index{wii\+Callback@{wii\+Callback}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{wii\+Callback}]{\setlength{\rightskip}{0pt plus 5cm}void wii\+Callback (
+\begin{DoxyParamCaption}
+\item[{const wiimote\+::\+State\+::\+Const\+Ptr \&}]{wii\+State}
+\end{DoxyParamCaption}
+)}\label{navigation__goals_8cpp_a401b97abbf3e813f2981b210379b4908}
+
+
+wii\+Callback callback for wii-\/controller, sets nunchuk\+\_\+c\+\_\+pressed 
+
+
+\begin{DoxyParams}{Parameters}
+{\em wii\+State} & state of the wii-\/controller \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Variable Documentation}
+\hypertarget{navigation__goals_8cpp_aea95c33791f3b1d4c3db490749dcc4c2}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!counter\+\_\+back@{counter\+\_\+back}}
+\index{counter\+\_\+back@{counter\+\_\+back}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{counter\+\_\+back}]{\setlength{\rightskip}{0pt plus 5cm}int counter\+\_\+back = 0}\label{navigation__goals_8cpp_aea95c33791f3b1d4c3db490749dcc4c2}
+
+
+counter so it actually drives backwards 
+
+\hypertarget{navigation__goals_8cpp_a41c2f8914d0edbc9bfe8019697280a82}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!counter\+\_\+try\+\_\+to\+\_\+follow@{counter\+\_\+try\+\_\+to\+\_\+follow}}
+\index{counter\+\_\+try\+\_\+to\+\_\+follow@{counter\+\_\+try\+\_\+to\+\_\+follow}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{counter\+\_\+try\+\_\+to\+\_\+follow}]{\setlength{\rightskip}{0pt plus 5cm}int counter\+\_\+try\+\_\+to\+\_\+follow = 0}\label{navigation__goals_8cpp_a41c2f8914d0edbc9bfe8019697280a82}
+
+
+counter so it doesnt try to follow forever 
+
+\hypertarget{navigation__goals_8cpp_a6943d822a23db3c821ac66e3482e09f5}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!desired\+\_\+x@{desired\+\_\+x}}
+\index{desired\+\_\+x@{desired\+\_\+x}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{desired\+\_\+x}]{\setlength{\rightskip}{0pt plus 5cm}double desired\+\_\+x = 0}\label{navigation__goals_8cpp_a6943d822a23db3c821ac66e3482e09f5}
+
+
+corresponce to the middlepoint of the image 
+
+\hypertarget{navigation__goals_8cpp_aa094a11625b9bf726abdb71caed8c9f1}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!desired\+\_\+y@{desired\+\_\+y}}
+\index{desired\+\_\+y@{desired\+\_\+y}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{desired\+\_\+y}]{\setlength{\rightskip}{0pt plus 5cm}double desired\+\_\+y = 0}\label{navigation__goals_8cpp_aa094a11625b9bf726abdb71caed8c9f1}
+
+
+corresponce to D\+E\+S\+I\+R\+E\+D\+\_\+\+Y 
+
+\hypertarget{navigation__goals_8cpp_ae432752a3c95315a00b3e3b42d4ba468}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!last\+\_\+linear@{last\+\_\+linear}}
+\index{last\+\_\+linear@{last\+\_\+linear}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{last\+\_\+linear}]{\setlength{\rightskip}{0pt plus 5cm}double last\+\_\+linear = 0}\label{navigation__goals_8cpp_ae432752a3c95315a00b3e3b42d4ba468}
+
+
+last linear value 
+
+\hypertarget{navigation__goals_8cpp_aaed5ad0eb2165b9cd4b804f12f44f624}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!last\+\_\+orientation@{last\+\_\+orientation}}
+\index{last\+\_\+orientation@{last\+\_\+orientation}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{last\+\_\+orientation}]{\setlength{\rightskip}{0pt plus 5cm}double last\+\_\+orientation = 0}\label{navigation__goals_8cpp_aaed5ad0eb2165b9cd4b804f12f44f624}
+
+
+last orientation value to try to follow if not autonomous driving is used 
+
+\hypertarget{navigation__goals_8cpp_a88864b29831db214ef58148acf0b8db4}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!linear\+\_\+int@{linear\+\_\+int}}
+\index{linear\+\_\+int@{linear\+\_\+int}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{linear\+\_\+int}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$double$>$ linear\+\_\+int}\label{navigation__goals_8cpp_a88864b29831db214ef58148acf0b8db4}
+
+
+Array for the Integral-\/\+Part of the P\+I\+D Controller. 
+
+\hypertarget{navigation__goals_8cpp_a084d89d497823f129f42ae61662efee4}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!linear\+\_\+int\+\_\+idx@{linear\+\_\+int\+\_\+idx}}
+\index{linear\+\_\+int\+\_\+idx@{linear\+\_\+int\+\_\+idx}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{linear\+\_\+int\+\_\+idx}]{\setlength{\rightskip}{0pt plus 5cm}int linear\+\_\+int\+\_\+idx = 0}\label{navigation__goals_8cpp_a084d89d497823f129f42ae61662efee4}
+
+
+current index of lienar\+\_\+int 
+
+\hypertarget{navigation__goals_8cpp_a86cf672daa4e0ad11ad10efc894d19c8}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!num@{num}}
+\index{num@{num}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{num}]{\setlength{\rightskip}{0pt plus 5cm}int num = 0}\label{navigation__goals_8cpp_a86cf672daa4e0ad11ad10efc894d19c8}
+
+
+seq number of goal for autonomous driving 
+
+\hypertarget{navigation__goals_8cpp_aa8828b6f9054e8ce4fa719f5790f0ad7}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!nunchuk\+\_\+c\+\_\+pressed@{nunchuk\+\_\+c\+\_\+pressed}}
+\index{nunchuk\+\_\+c\+\_\+pressed@{nunchuk\+\_\+c\+\_\+pressed}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{nunchuk\+\_\+c\+\_\+pressed}]{\setlength{\rightskip}{0pt plus 5cm}bool nunchuk\+\_\+c\+\_\+pressed = false}\label{navigation__goals_8cpp_aa8828b6f9054e8ce4fa719f5790f0ad7}
+
+
+value to tell if nunchuk c is pressed 
+
+\hypertarget{navigation__goals_8cpp_a5bafc98f16f9fd53e0f929fe20b17e1c}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!show@{show}}
+\index{show@{show}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{show}]{\setlength{\rightskip}{0pt plus 5cm}bool show = false}\label{navigation__goals_8cpp_a5bafc98f16f9fd53e0f929fe20b17e1c}
+
+
+should the images be shown on screen? 
+
+\hypertarget{navigation__goals_8cpp_a53a2d16dac430353052f49aaa0cce34a}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!stop@{stop}}
+\index{stop@{stop}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{stop}]{\setlength{\rightskip}{0pt plus 5cm}bool stop = false}\label{navigation__goals_8cpp_a53a2d16dac430353052f49aaa0cce34a}
+
+
+stop if near a wall 
+
+\hypertarget{navigation__goals_8cpp_a4a4c92bfaf637dd8d1776e2ed78dded5}{}\index{navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}!use\+\_\+autonomus@{use\+\_\+autonomus}}
+\index{use\+\_\+autonomus@{use\+\_\+autonomus}!navigation\+\_\+goals.\+cpp@{navigation\+\_\+goals.\+cpp}}
+\subsubsection[{use\+\_\+autonomus}]{\setlength{\rightskip}{0pt plus 5cm}bool use\+\_\+autonomus = false}\label{navigation__goals_8cpp_a4a4c92bfaf637dd8d1776e2ed78dded5}
+
+
+should it use autnomous driving (send goals) or try to follow directly (send servo commands) !\+W\+A\+R\+N\+I\+N\+G -\/$>$ no avoiding! Only drives while Nunchuck button C is pressed 
+
