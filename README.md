@@ -81,6 +81,6 @@ Use **this** at your own risk as this functionality **isn't tested!**
 If it doesnt find the *threshold_matrix.xml*, do *catkin_make* in a terminal, then start the *navigation_goals_node* or *calibrate_params* in the same terminal
 
 ### Using it with another setup
-Make sure you edit the servo-command topic such that it fits your robot if you wanna directly publish on the servo. Also you most likley have to change the callback if the wii-button is pressed. Everything in the file [navigation_goals.cpp](follow_ball/src/navigation_goals.cpp).
+Make sure you edit the servo-command topic such that it fits your robot if you wanna directly publish on the servo. Also you most likley have to change the callback if the wii-button is pressed. Everything is in the file [navigation_goals.cpp](follow_ball/src/navigation_goals.cpp).
 
 
