@@ -2,7 +2,7 @@ tas_car
 =======
 
 
-### Follow Ball (Raimund Zille)
+### Follow Ball
 This programm will make the car follow a monochrome ball.
 It is splitted in three parts:
 
@@ -19,7 +19,7 @@ Try to put the camera below the bumper for best result:
 * camera
 * monochrome ball
 * drivable car
-* wii-controler
+* wii-controller
 
 #### Calibrate params for new ball
 calibrate parameters for monochrome ball with following command:
@@ -60,7 +60,7 @@ important params:
 * **MAX_SEC_TRY_TO_FOLLOW** how long shall the car try to find the ball if it sees none (only important if autonomous is set to false)
 for detailed information check the [documentation](follow_ball_doxygen)
 
-//TODO Videos of the programm using autonomous set to false can be found [here](follow_ball_video)
+[![demo video](https://img.youtube.com/vi/x-ZtEVpXXc/0.jpg)](http://www.youtube.com/watch?v=x-ZtEVpXXc)
 
 #### Using autonomous stack
 If you wish to use the autonomous driving stack you should check if it makes any sense using the *find_consistent_circle* method of [find_ball](follow_ball/include/follow_ball.h) as well as the low processing rate set in [navigation_goals.cpp](follow_ball/src/navigation_goals.cpp).
