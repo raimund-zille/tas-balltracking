@@ -4,6 +4,11 @@ tas_car
 
 ### Follow Ball
 This programm will make the car follow a monochrome ball.
+
+### Demonstration video
+[![demo video](https://img.youtube.com/vi/x-ZtEVpXXc/0.jpg)](http://www.youtube.com/watch?v=x-ZtEVpXXc)
+
+### How it works
 It is splitted in three parts:
 
 1. The class [find_ball](follow_ball/include/follow_ball.h) which filters the images of the camera for the ball using OpenCV.
@@ -60,7 +65,6 @@ important params:
 * **MAX_SEC_TRY_TO_FOLLOW** how long shall the car try to find the ball if it sees none (only important if autonomous is set to false)
 for detailed information check the [documentation](follow_ball_doxygen)
 
-[![demo video](https://img.youtube.com/vi/x-ZtEVpXXc/0.jpg)](http://www.youtube.com/watch?v=x-ZtEVpXXc)
 
 #### Using autonomous stack
 If you wish to use the autonomous driving stack you should check if it makes any sense using the *find_consistent_circle* method of [find_ball](follow_ball/include/follow_ball.h) as well as the low processing rate set in [navigation_goals.cpp](follow_ball/src/navigation_goals.cpp).
