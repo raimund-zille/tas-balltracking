@@ -1,7 +1,7 @@
 tas car
 =======
 
-This was a project for the course "Technik autonomer Systeme" during my electrical and computational engineering master at the Technical University Munich.
+This was a project for the course "Technik autonomer Systeme" during my electrical and computational engineering master (WS 16/17) at the Technical University Munich.
 
 ### Follow Ball
 This programm will make the car follow a monochrome ball.
